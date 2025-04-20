@@ -1,0 +1,31 @@
+// Laranga-app ERD click this link https://dbdiagram.io/d/timelydoc-6804446d1ca52373f59b5425
+
+// Configuration
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// Model
+model roles {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(20)
+
+    @@map("roles")
+}
+
+model users {
+    id       Int     @id @default(autoincrement())
+    email    String  @unique
+    username String  @db.VarChar(100)
+    fullName String  @db.VarChar(100)
+    password String  @db.VarChar(100)
+    isActive Boolean @default(false)
+
+    @@map("users")
+}

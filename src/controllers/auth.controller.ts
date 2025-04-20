@@ -1,52 +1,41 @@
 import { Request, Response } from "express";
-import * as Yup from "yup";
+import prisma from "../utils.ts/prisma";
+import { userDTO } from "../models/user.model";
+import response from "../utils.ts/response";
+import { hash } from "argon2";
 
 type TRegister = {
   email: string;
   username: string;
-  full_name: string;
+  fullName: string;
   password: string;
-  confirm_password: string;
-  is_active: boolean;
+  confirmPassword: string;
+  isActive: boolean;
 };
-
-const registerValidateSchema = Yup.object({
-  email: Yup.string().required(),
-  username: Yup.string().required(),
-  full_name: Yup.string().required(),
-  password: Yup.string().required(),
-  confirm_password: Yup.string()
-    .required()
-    .oneOf([Yup.ref("password")], "Password is not match"),
-});
 
 export default {
   async register(req: Request, res: Response) {
-    const { email, username, full_name, password, confirm_password } = req.body as unknown as TRegister;
+    const payload = req.body as unknown as TRegister;
 
     try {
-      await registerValidateSchema.validate({
-        email,
-        username,
-        full_name,
-        password,
-        confirm_password,
-      });
+      await userDTO.validate(payload);
 
-      res.status(200).json({
-        message: "success registration",
+      const { password, confirmPassword, ...user } = payload;
+
+      const hashedPassword = await hash(password);
+
+      const result = await prisma.users.create({
         data: {
-          full_name,
-          username,
-          email,
+          ...user,
+          password: hashedPassword,
         },
       });
+
+      const { password: _, ...safeUser } = result;
+
+      response.success(res, safeUser, "registration success!");
     } catch (error) {
-      const err = error as unknown as Error;
-      res.status(400).json({
-        message: err.message,
-        data: null,
-      });
+      response.error(res, error, "registration failed!");
     }
   },
 };
