@@ -1,8 +1,9 @@
 import { Request, Response } from "express";
-import prisma from "../utils.ts/prisma";
+import prisma from "../utils/prisma";
 import { userDTO } from "../models/user.model";
-import response from "../utils.ts/response";
-import { hash } from "argon2";
+import response from "../utils/response";
+import { hash, verify } from "argon2";
+import jwt from "jsonwebtoken";
 
 type TRegister = {
   email: string;
@@ -11,6 +12,11 @@ type TRegister = {
   password: string;
   confirmPassword: string;
   isActive: boolean;
+};
+
+type TLogin = {
+  email: string;
+  password: string;
 };
 
 export default {
@@ -27,15 +33,43 @@ export default {
       const result = await prisma.users.create({
         data: {
           ...user,
+          isActive: true,
           password: hashedPassword,
         },
       });
 
-      const { password: _, ...safeUser } = result;
+      const { password: _, isActive, ...safeUser } = result;
 
       response.success(res, safeUser, "registration success!");
     } catch (error) {
       response.error(res, error, "registration failed!");
+    }
+  },
+
+  async login(req: Request, res: Response): Promise<void> {
+    const payload = req.body as TLogin;
+
+    try {
+      const user = await prisma.users.findUnique({
+        where: { email: payload.email },
+      });
+
+      if (!user) {
+        response.error(res, null, "Invalid username or password", 401);
+      }
+      const validPassword = await verify(user!.password, payload.password);
+
+      if (!validPassword) {
+        response.error(res, null, "Invalid username or password", 401);
+      }
+
+      const token = jwt.sign({ userId: user!.id, username: user!.username }, process.env.JWT_SECRET as string, {
+        expiresIn: "1h",
+      });
+
+      response.success(res, { token }, "Login successful!");
+    } catch (error) {
+      response.error(res, error, "Login failed!");
     }
   },
 };
