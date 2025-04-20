@@ -35,18 +35,19 @@ export default {
           ...user,
           isActive: true,
           password: hashedPassword,
+          roles_id: 1,
         },
       });
 
       const { password: _, isActive, ...safeUser } = result;
 
-      response.success(res, safeUser, "registration success!");
+      return response.success(res, safeUser, "registration success!");
     } catch (error) {
-      response.error(res, error, "registration failed!");
+      return response.error(res, error, "registration failed!");
     }
   },
 
-  async login(req: Request, res: Response): Promise<void> {
+  async login(req: Request, res: Response) {
     const payload = req.body as TLogin;
 
     try {
@@ -55,19 +56,19 @@ export default {
       });
 
       if (!user) {
-        response.error(res, null, "Invalid username or password", 401);
+        return response.error(res, null, "Invalid username or password", 401);
       }
       const validPassword = await verify(user!.password, payload.password);
 
       if (!validPassword) {
-        response.error(res, null, "Invalid username or password", 401);
+        return response.error(res, null, "Invalid username or password", 401);
       }
 
       const token = jwt.sign({ userId: user!.id, username: user!.username }, process.env.JWT_SECRET as string, {
         expiresIn: "1h",
       });
 
-      response.success(res, { token }, "Login successful!");
+      return response.success(res, { token }, "Login successful!");
     } catch (error) {
       response.error(res, error, "Login failed!");
     }

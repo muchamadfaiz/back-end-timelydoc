@@ -3,6 +3,7 @@ import router from "./routes/api";
 import bodyParser from "body-parser";
 import prisma from "./utils/prisma";
 import errorMiddleware from "./middlewares/error.middleware";
+import response from "./utils/response";
 
 const app = express();
 
@@ -10,6 +11,10 @@ const PORT = 3000;
 
 // middleware(body-parser)
 app.use(bodyParser.json());
+
+app.get("/", (req, res) => {
+  response.success(res, null, "Server is Running");
+});
 
 // middleware (router)
 app.use("/api", router);

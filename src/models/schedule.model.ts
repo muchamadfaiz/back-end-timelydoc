@@ -31,6 +31,6 @@ export const scheduleDTO = Yup.object({
   status: Yup.boolean().default(true),
   date_range: Yup.object({
     start: Yup.string().required(),
-    end: Yup.string().required(),
+    finish: Yup.string().required(),
   }).required(),
 });

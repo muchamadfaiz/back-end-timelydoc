@@ -5,6 +5,7 @@ import { getDayInIndo } from "../utils/helper";
 import { scheduleDTO } from "../models/schedule.model";
 
 /**
+ * Example body
  * {
   "doctor_id": 1,
   "day": "Senin",
@@ -48,7 +49,9 @@ export default {
       }
 
       const start = new Date(date_range.start);
+      console.log("", start);
       const finish = new Date(date_range.finish);
+      console.log("", finish);
 
       let current = new Date(start);
       const bulkSchedules: any[] = [];
@@ -90,9 +93,9 @@ export default {
         data: bulkSchedules,
       });
 
-      response.success(res, result, "success create schedules");
+      return response.success(res, result, "success create schedules");
     } catch (error) {
-      response.error(res, error, "failed create schedules");
+      return response.error(res, error, "failed create schedules");
     }
   },
 
@@ -101,9 +104,9 @@ export default {
       const result = await prisma.schedules.findMany({
         include: { doctor: true },
       });
-      response.success(res, result, "success get all schedules");
+      return response.success(res, result, "success get all schedules");
     } catch (error) {
-      response.error(res, error, "failed find all schedules");
+      return response.error(res, error, "failed find all schedules");
     }
   },
 };

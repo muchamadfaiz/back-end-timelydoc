@@ -16,6 +16,8 @@ model roles {
     id   Int    @id @default(autoincrement())
     name String @db.VarChar(20)
 
+    user users[]
+
     @@map("roles")
 }
 
@@ -26,6 +28,9 @@ model users {
     fullName String  @db.VarChar(100)
     password String  @db.VarChar(100)
     isActive Boolean @default(false)
+
+    role     roles? @relation(fields: [roles_id], references: [id])
+    roles_id Int?
 
     @@map("users")
 }
