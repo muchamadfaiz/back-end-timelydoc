@@ -1,7 +1,7 @@
 import express from "express";
 import router from "./routes/api";
 import bodyParser from "body-parser";
-import prisma from "./utils.ts/prisma";
+import prisma from "./utils/prisma";
 import errorMiddleware from "./middlewares/error.middleware";
 
 const app = express();

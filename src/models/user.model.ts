@@ -13,6 +13,7 @@ const validatePassword = Yup.string()
     const regex = /^(?=.*\d)/;
     return regex.test(value);
   });
+
 const validateConfirmPassword = Yup.string()
   .required()
   .oneOf([Yup.ref("password"), ""], "Password not match");
