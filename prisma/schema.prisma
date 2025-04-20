@@ -29,3 +29,27 @@ model users {
 
     @@map("users")
 }
+
+model doctors {
+    id   Int    @id @default(autoincrement())
+    name String @db.VarChar(100)
+
+    schedules schedules[]
+
+    @@map("doctors")
+}
+
+model schedules {
+    id          Int      @id @default(autoincrement())
+    doctor_id   Int
+    day         String   @db.VarChar(100)
+    quota       Int
+    time_start  String   @db.VarChar(100)
+    time_finish String   @db.VarChar(100)
+    status      Boolean  @default(true)
+    date        DateTime
+
+    doctor doctors @relation(fields: [doctor_id], references: [id])
+
+    @@map("schedules")
+}
